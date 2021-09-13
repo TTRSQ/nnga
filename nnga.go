@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"math"
 	"os"
 	"strconv"
 	"strings"
@@ -49,13 +50,34 @@ func (nnga *NNGA) Forward(input []float64) (*gmatrix.Matrix, error) {
 	return ret, nil
 }
 
+func (nnga *NNGA) ForwardSig(input []float64) (*gmatrix.Matrix, error) {
+	ret, err := gmatrix.NewMatrix(1, len(input), input)
+	if err != nil {
+		return nil, err
+	}
+	for i := range nnga.tensors {
+		ret, err = ret.Mul(nnga.tensors[i])
+		if err != nil {
+			return nil, err
+		}
+		ret, err = sigmoid(ret)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return ret, nil
+}
+
+func sigmoid(m *gmatrix.Matrix) (*gmatrix.Matrix, error) {
+	fn := func(val float64) (float64, error) {
+		return 1 / (1 + math.Exp(-val)), nil
+	}
+	return m.Func(fn)
+}
+
 func relu(m *gmatrix.Matrix) (*gmatrix.Matrix, error) {
 	fn := func(val float64) (float64, error) {
-		if val > 0 {
-			return val, nil
-		} else {
-			return 0, nil
-		}
+		return math.Max(0, val), nil
 	}
 	return m.Func(fn)
 }
