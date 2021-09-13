@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/TTRSQ/gmatrix"
@@ -117,24 +118,45 @@ func (nnga *NNGA) Save(filePath string) error {
 	return nil
 }
 
-func (nnga *NNGA) Load(filePath string) error {
+func (nnga *NNGA) Load(filePath string) (*NNGA, error) {
 	fp, err := os.Open(filePath)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer fp.Close()
 	scanner := bufio.NewScanner(fp)
 
+	tensors := []*gmatrix.Matrix{}
 	for scanner.Scan() {
 		row := strings.Split(scanner.Text(), ",")
 		head := strings.Split(row[0], " ")
+		r, err := strconv.ParseInt(head[0], 10, 64)
+		if err != nil {
+			return nil, err
+		}
+		c, err := strconv.ParseInt(head[0], 10, 64)
+		if err != nil {
+			return nil, err
+		}
 		data := strings.Split(row[1], " ")
-		fmt.Println(head, data)
+		datas := []float64{}
+		for i := range data {
+			f, err := strconv.ParseFloat(data[i], 64)
+			if err != nil {
+				return nil, err
+			}
+			datas = append(datas, f)
+		}
+		mat, err := gmatrix.NewMatrix(int(r), int(c), datas)
+		if err != nil {
+			return nil, err
+		}
+		tensors = append(tensors, mat)
 	}
 
 	if err = scanner.Err(); err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return NewNNGA(tensors)
 }
