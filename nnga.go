@@ -36,7 +36,10 @@ func (nnga *NNGA) Forward(input []float64) (*gmatrix.Matrix, error) {
 		if err != nil {
 			return nil, err
 		}
-		relu(ret)
+		ret, err = relu(ret)
+		if err != nil {
+			return nil, err
+		}
 	}
 	return ret, nil
 }
