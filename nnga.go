@@ -32,7 +32,7 @@ func (nnga *NNGA) Forward(input []float64) (*gmatrix.Matrix, error) {
 		return nil, err
 	}
 	for i := range nnga.tensors {
-		ret, err = nnga.tensors[i].Mul(ret)
+		ret, err = ret.Mul(nnga.tensors[i])
 		if err != nil {
 			return nil, err
 		}
