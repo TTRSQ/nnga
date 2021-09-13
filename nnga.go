@@ -134,7 +134,7 @@ func (nnga *NNGA) Load(filePath string) (*NNGA, error) {
 		if err != nil {
 			return nil, err
 		}
-		c, err := strconv.ParseInt(head[0], 10, 64)
+		c, err := strconv.ParseInt(head[1], 10, 64)
 		if err != nil {
 			return nil, err
 		}
