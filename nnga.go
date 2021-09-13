@@ -97,7 +97,7 @@ func (nnga *NNGA) Save(filePath string) error {
 	for i := range nnga.tensors {
 		r := nnga.tensors[i].R()
 		c := nnga.tensors[i].C()
-		_, err = file.Write(([]byte)(fmt.Sprintf("%d %d", r, c)))
+		_, err = file.Write(([]byte)(fmt.Sprintf("%d %d\n", r, c)))
 		if err != nil {
 			return err
 		}
@@ -107,6 +107,10 @@ func (nnga *NNGA) Save(filePath string) error {
 				dataStr += " "
 			}
 			dataStr += fmt.Sprint(nnga.tensors[i].Datas()[j])
+		}
+		_, err = file.Write(([]byte)(fmt.Sprintf("%s\n", dataStr)))
+		if err != nil {
+			return err
 		}
 	}
 	return nil
