@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/TTRSQ/gmatrix"
 )
@@ -97,7 +98,7 @@ func (nnga *NNGA) Save(filePath string) error {
 	for i := range nnga.tensors {
 		r := nnga.tensors[i].R()
 		c := nnga.tensors[i].C()
-		_, err = file.Write(([]byte)(fmt.Sprintf("%d %d\n", r, c)))
+		_, err = file.Write(([]byte)(fmt.Sprintf("%d %d,", r, c)))
 		if err != nil {
 			return err
 		}
@@ -125,7 +126,10 @@ func (nnga *NNGA) Load(filePath string) error {
 	scanner := bufio.NewScanner(fp)
 
 	for scanner.Scan() {
-		fmt.Println(scanner.Text())
+		row := strings.Split(scanner.Text(), ",")
+		head := strings.Split(row[0], " ")
+		data := strings.Split(row[1], " ")
+		fmt.Println(head, data)
 	}
 
 	if err = scanner.Err(); err != nil {
