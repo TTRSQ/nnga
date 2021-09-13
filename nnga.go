@@ -1,7 +1,10 @@
 package nnga
 
 import (
+	"bufio"
 	"errors"
+	"fmt"
+	"os"
 
 	"github.com/TTRSQ/gmatrix"
 )
@@ -83,4 +86,47 @@ func (nngaa *NNGA) Mean(nngab *NNGA) (*NNGA, error) {
 		tensors = append(tensors, mat)
 	}
 	return NewNNGA(tensors)
+}
+
+func (nnga *NNGA) Save(filePath string) error {
+	file, err := os.Create(filePath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	for i := range nnga.tensors {
+		r := nnga.tensors[i].R()
+		c := nnga.tensors[i].C()
+		_, err = file.Write(([]byte)(fmt.Sprintf("%d %d", r, c)))
+		if err != nil {
+			return err
+		}
+		dataStr := ""
+		for j := range nnga.tensors[i].Datas() {
+			if j != 0 {
+				dataStr += " "
+			}
+			dataStr += fmt.Sprint(nnga.tensors[i].Datas()[j])
+		}
+	}
+	return nil
+}
+
+func (nnga *NNGA) Load(filePath string) error {
+	fp, err := os.Open(filePath)
+	if err != nil {
+		return err
+	}
+	defer fp.Close()
+	scanner := bufio.NewScanner(fp)
+
+	for scanner.Scan() {
+		fmt.Println(scanner.Text())
+	}
+
+	if err = scanner.Err(); err != nil {
+		return err
+	}
+
+	return nil
 }
