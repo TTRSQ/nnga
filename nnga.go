@@ -50,6 +50,24 @@ func (nnga *NNGA) Forward(input []float64) (*gmatrix.Matrix, error) {
 	return ret, nil
 }
 
+func (nnga *NNGA) ParallelForward(input []float64) (*gmatrix.Matrix, error) {
+	ret, err := gmatrix.NewMatrix(1, len(input), input)
+	if err != nil {
+		return nil, err
+	}
+	for i := range nnga.tensors {
+		ret, err = ret.MulParallel(nnga.tensors[i])
+		if err != nil {
+			return nil, err
+		}
+		ret, err = relu(ret)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return ret, nil
+}
+
 func (nnga *NNGA) ForwardSig(input []float64) (*gmatrix.Matrix, error) {
 	ret, err := gmatrix.NewMatrix(1, len(input), input)
 	if err != nil {
